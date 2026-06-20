@@ -1,39 +1,56 @@
-import '../services/api_constants.dart';
+import 'video_model.dart';
 
 class MovieDetail {
-  final String backdropUrl;
-  final String posterUrl;
+  final int id;
   final String title;
+  final String overview;
+  final String? posterPath;
+  final String? backdropPath;
   final double voteAverage;
   final int runtime;
+  final String releaseDate;
   final List<String> genres;
-  final String overview;
+  final List<VideoModel> videos;
 
   MovieDetail({
-    required this.backdropUrl,
-    required this.posterUrl,
+    required this.id,
     required this.title,
+    required this.overview,
+    this.posterPath,
+    this.backdropPath,
     required this.voteAverage,
     required this.runtime,
+    required this.releaseDate,
     required this.genres,
-    required this.overview,
+    required this.videos,
   });
 
   factory MovieDetail.fromJson(Map<String, dynamic> json) {
     return MovieDetail(
-      backdropUrl: json['backdrop_path'] != null
-          ? '${ApiConstants.imageBaseUrl}${json['backdrop_path']}'
-          : '',
-      posterUrl: json['poster_path'] != null
-          ? '${ApiConstants.imageBaseUrl}${json['poster_path']}'
-          : '',
+      id: json['id'] ?? 0,
       title: json['title'] ?? '',
+      overview: json['overview'] ?? '',
+      posterPath: json['poster_path'],
+      backdropPath: json['backdrop_path'],
       voteAverage: (json['vote_average'] ?? 0).toDouble(),
       runtime: json['runtime'] ?? 0,
-      genres: json['genres'] != null
-          ? (json['genres'] as List).map((g) => g['name'].toString()).toList()
+      releaseDate: json['release_date'] ?? '',
+      genres: (json['genres'] as List? ?? [])
+          .map((g) => g['name'] as String)
+          .toList(),
+      videos: json['videos'] != null
+          ? (json['videos']['results'] as List? ?? [])
+              .map((v) => VideoModel.fromJson(v))
+              .toList()
           : [],
-      overview: json['overview'] ?? '',
     );
   }
+
+  String get posterUrl => posterPath != null
+      ? 'https://image.tmdb.org/t/p/w500$posterPath'
+      : '';
+
+  String get backdropUrl => backdropPath != null
+      ? 'https://image.tmdb.org/t/p/original$backdropPath'
+      : '';
 }

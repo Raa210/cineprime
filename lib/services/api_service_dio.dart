@@ -19,18 +19,36 @@ class ApiServiceDio {
     }
   }
 
+  Future<MovieResponse> searchMovies(String query) async {
+    try {
+      final response = await _dio.get(
+        '/search/movie',
+        queryParameters: {'query': query},
+      );
+      return MovieResponse.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Failed to search movies: $e');
+    }
+  }
+
   Future<MovieDetail> getMovieDetail(int id) async {
     try {
-      final response = await _dio.get('/movie/$id');
+      final response = await _dio.get(
+        '/movie/$id',
+        queryParameters: {'append_to_response': 'videos'},
+      );
       return MovieDetail.fromJson(response.data);
     } catch (e) {
       throw Exception('Failed to load movie detail: $e');
     }
   }
 
-  Future<ReviewResponse> getMovieReviews(int id) async {
+  Future<ReviewResponse> getMovieReviews(int id, {int page = 1}) async {
     try {
-      final response = await _dio.get('/movie/$id/reviews');
+      final response = await _dio.get(
+        '/movie/$id/reviews',
+        queryParameters: {'page': page},
+      );
       return ReviewResponse.fromJson(response.data);
     } catch (e) {
       throw Exception('Failed to load movie reviews: $e');
